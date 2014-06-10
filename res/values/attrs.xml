@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="PageIndicator">
-        <attr name="numIndicators" format=""/>
-        <attr name=""/>            
-        <attr name="extraInformation" format="string" />
+        <attr name="num_indicators" format="integer"/>
+        <attr name="indicator_radius" format="dimension"/>      
+        <attr name="color" format="color"/>
+        <attr name="bgcolor" format="color"/>
+        <attr name="current_view_image" format="reference"/>  
+        <attr name="view_image" format="reference"/>
     </declare-styleable>
 </resources>

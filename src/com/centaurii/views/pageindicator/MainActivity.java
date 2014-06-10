@@ -1,71 +1,108 @@
 package com.centaurii.views.pageindicator;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import com.centaurii.views.pageindicator.lib.PageIndicator;
+
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
+import android.widget.TextView;
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends FragmentActivity
 {
+
+    DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
+    ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        if (savedInstanceState == null)
+        
+        final PageIndicator pageTracker = (PageIndicator) findViewById(R.id.page_tracker);
+        
+        // ViewPager and its adapters use support library
+        // fragments, so use getSupportFragmentManager.
+        mDemoCollectionPagerAdapter =
+                new DemoCollectionPagerAdapter(
+                        getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        
+        mViewPager.setOnPageChangeListener(new OnPageChangeListener()
         {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment()).commit();
-        }
+
+            @Override
+            public void onPageScrollStateChanged(int arg0) {}
+
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {}
+
+            @Override
+            public void onPageSelected(int position)
+            {
+                pageTracker.setCurrentPosition(position);
+                pageTracker.invalidate();
+            }
+            
+        });
+
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
+    public class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter
     {
+        public DemoCollectionPagerAdapter(FragmentManager fm)
+        {
+            super(fm);
+        }
 
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        @Override
+        public Fragment getItem(int i)
+        {
+            Fragment fragment = new DemoObjectFragment();
+            Bundle args = new Bundle();
+            // Our object is just an integer :-P
+            args.putInt(DemoObjectFragment.ARG_OBJECT, i + 1);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public int getCount()
+        {
+            return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position)
+        {
+            return "OBJECT " + (position + 1);
+        }
+
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public static class DemoObjectFragment extends Fragment
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings)
-        {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment
-    {
-
-        public PlaceholderFragment()
-        {
-        }
+        public static final String ARG_OBJECT = "object";
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState)
         {
-            View rootView = inflater.inflate(R.layout.fragment_main, container,
-                    false);
+            // The last two arguments ensure LayoutParams are inflated
+            // properly.
+            View rootView = inflater.inflate(
+                    R.layout.fragment_main, container, false);
+            Bundle args = getArguments();
+            ((TextView) rootView.findViewById(R.id.text_view)).setText(Integer
+                    .toString(args.getInt(ARG_OBJECT)));
             return rootView;
         }
     }
